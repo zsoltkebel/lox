@@ -4,6 +4,7 @@ import lox.Expr.Binary;
 import lox.Expr.Grouping;
 import lox.Expr.Literal;
 import lox.Expr.Unary;
+import lox.Expr.Variable;
 
 public class AstPrinter implements Expr.Visitor<String> {
     String print(Expr expr) {
@@ -52,5 +53,10 @@ public class AstPrinter implements Expr.Visitor<String> {
                 new Expr.Grouping(
                         new Expr.Literal(45.67)));
         System.out.println(new AstPrinter().print(expression));
+    }
+
+    @Override
+    public String visitVariableExpr(Variable expr) {
+        throw new UnsupportedOperationException("Unimplemented method 'visitVariableExpr'");
     }
 }
