@@ -7,13 +7,14 @@ import static lox.TokenType.*;
 /**
  * Grammar:
  * 
- * expression → equality ;
- * equality → comparison ( ( "!=" | "==" ) comparison )* ;
+ * expression → ternary ;
+ * ternary    → ( ( equality "?" equality ":" equality ) )* equality ;
+ * equality   → comparison ( ( "!=" | "==" ) comparison )* ;
  * comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
- * term → factor ( ( "-" | "+" ) factor )* ;
- * factor → unary ( ( "/" | "*" ) unary )* ;
- * unary → ( "!" | "-" ) unary | primary ;
- * primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+ * term       → factor ( ( "-" | "+" ) factor )* ;
+ * factor     → unary ( ( "/" | "*" ) unary )* ;
+ * unary      → ( "!" | "-" ) unary | primary ;
+ * primary    → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
  */
 public class Parser {
     private static class ParseError extends RuntimeException {
@@ -35,7 +36,20 @@ public class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return ternary();
+    }
+
+    private Expr ternary() {
+        Expr expr = equality();
+
+        if (match(QUERY)) {
+            Expr left = equality();
+            consume(COLON, "Expect ':' after condition in ternary operator.");
+            Expr right = equality();
+            return new Expr.Ternary(expr, left, right);
+        }
+
+        return expr;
     }
 
     private Expr equality() {
