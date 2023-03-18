@@ -18,13 +18,15 @@ import static lox.TokenType.*;
  * parameters → IDENTIFIER ( "," IDENTIFIER )* ;
  * 
  * varDecl → "var" IDENTIFIER ( "=" expression )? ";" ;
- * statement → exprStmt | forStmt | ifStmt | printStmt | whileStmt | block ;
+ * statement → exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt
+ * | block ;
  * 
  * exprStmt → expression ";" ;
  * forStmt → "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression?
  * ")" statement ;
  * ifStmt → "if" "(" expression ")" statement ( "else" statement )? ;
  * printStmt → "print" expression ";" ;
+ * returnStmt → "return" expression? ";" ;
  * whileStmt → "while" "()"" expression ")" statement ;
  * block → "{" declaration* "}" ;
  * 
@@ -88,6 +90,8 @@ public class Parser {
             return ifStatement();
         if (match(PRINT))
             return printStatement();
+        if (match(RETURN))
+            return returnStatement();
         if (match(WHILE))
             return whileStatement();
         if (match(LEFT_BRACE))
@@ -162,6 +166,17 @@ public class Parser {
         Expr value = expression();
         consume(SEMICOLON, "Expect ';' after value.");
         return new Stmt.Print(value);
+    }
+
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+        if (!check(SEMICOLON)) {
+            value = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value);
     }
 
     private Stmt varDeclaration() {
