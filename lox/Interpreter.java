@@ -11,6 +11,7 @@ import lox.Expr.Literal;
 import lox.Expr.Logical;
 import lox.Expr.Unary;
 import lox.Stmt.Block;
+import lox.Stmt.Function;
 import lox.Stmt.If;
 import lox.Stmt.While;
 
@@ -217,7 +218,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         List<Object> arguments = new ArrayList<>();
         for (Expr argument : expr.arguments) {
-            arguments.add(evaluate(expr));
+            arguments.add(evaluate(argument));
         }
 
         if (!(callee instanceof LoxCallable)) {
@@ -237,6 +238,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
         evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitFunctionStmt(Function stmt) {
+        LoxFunction function = new LoxFunction(stmt);
+        environment.define(stmt.name.lexeme, function);
         return null;
     }
 
